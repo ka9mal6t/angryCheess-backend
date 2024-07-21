@@ -47,6 +47,7 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
                     stat: Statistics = await StatisticsDAO.find_one_or_none(user_id=current_user.id)
                     stat.rating += random.randint(20, 30)
                     await StatisticsDAO.update({'rating': stat.rating if stat.rating > 0 else 0,
+                                                'games': stat.games + 1,
                                                 'wins': stat.wins + 1},
                                                user_id=current_user.id)
                     await UsersDAO.update({'inGame': False}, id=current_user.id)
@@ -59,6 +60,7 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
                     stat: Statistics = await StatisticsDAO.find_one_or_none(user_id=rival_id)
                     stat.rating -= random.randint(20, 30)
                     await StatisticsDAO.update({'rating': stat.rating if stat.rating > 0 else 0,
+                                                'games': stat.games + 1,
                                                 'losses': stat.losses + 1},
                                                user_id=rival_id)
 
@@ -76,6 +78,7 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
                     stat: Statistics = await StatisticsDAO.find_one_or_none(user_id=current_user.id)
                     stat.rating += random.randint(1, 5)
                     await StatisticsDAO.update({'rating': stat.rating if stat.rating > 0 else 0,
+                                                'games': stat.games + 1,
                                                 'draws': stat.draws + 1},
                                                user_id=current_user.id)
                     await UsersDAO.update({'inGame': False}, id=current_user.id)
@@ -88,6 +91,7 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
                     stat: Statistics = await StatisticsDAO.find_one_or_none(user_id=rival_id)
                     stat.rating -= random.randint(1, 5)
                     await StatisticsDAO.update({'rating': stat.rating if stat.rating > 0 else 0,
+                                                'games': stat.games + 1,
                                                 'draws': stat.draws + 1},
                                                user_id=rival_id)
 
