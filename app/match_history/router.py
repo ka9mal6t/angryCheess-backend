@@ -37,17 +37,17 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
             data_str = await websocket.receive_text()
             try:
                 data = json.loads(data_str)
-                if data.get("board") == 'loose' and manager.check_status(match_id=match.id):
+                if data.get("board") == 'win' and manager.check_status(match_id=match.id):
                     response_dict = {'id': current_user.id,
-                                     'board': 'loose'
+                                     'board': 'win'
                                      }
                     response_str = json.dumps(response_dict)
                     await manager.broadcast(response_str, match.id)
 
                     stat: Statistics = await StatisticsDAO.find_one_or_none(user_id=current_user.id)
-                    stat.rating -= random.randint(20, 30)
+                    stat.rating += random.randint(20, 30)
                     await StatisticsDAO.update({'rating': stat.rating if stat.rating > 0 else 0,
-                                                'losses': stat.losses + 1},
+                                                'wins': stat.wins + 1},
                                                user_id=current_user.id)
                     await UsersDAO.update({'inGame': False}, id=current_user.id)
 
@@ -57,13 +57,13 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
                         rival_id = match.white_id
 
                     stat: Statistics = await StatisticsDAO.find_one_or_none(user_id=rival_id)
-                    stat.rating += random.randint(20, 30)
+                    stat.rating -= random.randint(20, 30)
                     await StatisticsDAO.update({'rating': stat.rating if stat.rating > 0 else 0,
-                                                'wins': stat.wins + 1},
+                                                'losses': stat.losses + 1},
                                                user_id=rival_id)
 
-                    await MatchesDAO.update({'winner_id': rival_id, 'end': True, 'time_end': datetime.now()},
-                                            id=rival_id)
+                    await MatchesDAO.update({'winner_id': current_user.id, 'end': True, 'time_end': datetime.now()},
+                                            id=match.id)
                     await UsersDAO.update({'inGame': False},
                                           id=rival_id)
                 elif data.get("board") == 'draw' and manager.check_status(match_id=match.id):
@@ -74,7 +74,7 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
                     await manager.broadcast(response_str, match.id)
 
                     stat: Statistics = await StatisticsDAO.find_one_or_none(user_id=current_user.id)
-                    stat.rating -= random.randint(1, 5)
+                    stat.rating += random.randint(1, 5)
                     await StatisticsDAO.update({'rating': stat.rating if stat.rating > 0 else 0,
                                                 'draws': stat.draws + 1},
                                                user_id=current_user.id)
@@ -86,13 +86,13 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
                         rival_id = match.white_id
 
                     stat: Statistics = await StatisticsDAO.find_one_or_none(user_id=rival_id)
-                    stat.rating += random.randint(1, 5)
+                    stat.rating -= random.randint(1, 5)
                     await StatisticsDAO.update({'rating': stat.rating if stat.rating > 0 else 0,
                                                 'draws': stat.draws + 1},
                                                user_id=rival_id)
 
                     await MatchesDAO.update({'winner_id': None, 'end': True, 'time_end': datetime.now()},
-                                            id=rival_id)
+                                            id=match.id)
                     await UsersDAO.update({'inGame': False},
                                           id=rival_id)
 

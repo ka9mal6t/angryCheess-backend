@@ -5,6 +5,7 @@ from app.matches.dao import MatchesDAO
 from app.matches.models import Matches
 from app.search.models import Search
 from app.statistics.dao import StatisticsDAO
+from app.statistics.models import Statistics
 from app.users.auth import create_access_token, get_password_hash, verify_password
 from app.users.dao import UsersDAO
 from app.search.dao import SearchDAO
@@ -65,9 +66,17 @@ async def check_status_game(current_user: Users = Depends(get_user)) -> dict:
     if current_user.inGame is False:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     else:
+        stats: Statistics = await StatisticsDAO.find_one_or_none(user_id=current_user.id)
         match: Matches = await MatchesDAO.find_one_or_none_by_user(current_user.id)
         if match:
+            enemy: Users = await UsersDAO.find_one_or_none(
+                id=match.black_id if match.white_id == current_user.id else match.white_id)
+            enemy_stats: Statistics = await StatisticsDAO.find_one_or_none(user_id=enemy.id)
             return {'match': match.id,
+                    'nickname': current_user.username,
+                    'rating': stats.rating,
+                    'enemy_nickname': enemy.username,
+                    'enemy_rating': enemy_stats.rating,
                     'user_id': current_user.id,
                     'color': 0 if match.white_id == current_user.id else 1}
         else:
