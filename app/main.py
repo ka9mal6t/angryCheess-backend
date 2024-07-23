@@ -17,7 +17,8 @@ app.include_router(recovery_router)
 app.include_router(match_history_router)
 
 origins = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "https://ka9mal6t.github.io",
 ]
 
 
