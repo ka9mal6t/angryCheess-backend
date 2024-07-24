@@ -20,6 +20,6 @@ router = APIRouter(
 async def game_result(current_user: Users = Depends(get_user), match_id: int):
     match = await MatchesDAO.find_one_or_none(id=match_id)
     if not match:
-        raise 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, )
     return match
     
