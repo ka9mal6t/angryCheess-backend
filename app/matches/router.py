@@ -5,7 +5,7 @@ from starlette import status
 
 from app.users.auth import create_access_token, get_password_hash, verify_password
 from app.users.dao import UsersDAO
-from app.statistics.dao import StatisticsDAO
+from app.matches.dao import MatchessDAO
 from app.users.dependencies import get_user
 
 from app.users.models import Users
