@@ -32,6 +32,15 @@ async def gameDetails(current_user: Users = Depends(get_user), match_id: int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, )
     match_history = await MatchHistoryDAO.find_all(match_id=match_id)
     return match_history
+    
+
+@router.get("/gameOnlineDetails/{match_id}")
+async def gameOnlineDetails(current_user: Users = Depends(get_user), match_id: int):
+    match = await MatchesDAO.find_one_or_none(id=match_id)
+    if not match:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, )
+    match_history = await MatchHistoryDAO.find_all(match_id=match_id)
+    return match_history
         
     
     
