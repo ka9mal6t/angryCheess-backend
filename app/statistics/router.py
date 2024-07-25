@@ -41,12 +41,12 @@ async def info_user(current_user: Users = Depends(get_user)) -> dict:
     }
 
 
-@router.get("matches/{user_id}")
+@router.get("/matches/{user_id}")
 async def stats_matches(user_id: int, current_user: Users = Depends(get_user)):
     return await MatchesDAO.find_all_by_user(user_id=user_id)
 
 
-@router.get("info/{user_id}")
+@router.get("/info/{user_id}")
 async def user_info(user_id: int, current_user: Users = Depends(get_user)):
     user: Users = await UsersDAO.find_one_or_none(id=user_id)
     statistics = await StatisticsDAO.find_one_or_none(user_id=user_id)
