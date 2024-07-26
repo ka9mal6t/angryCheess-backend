@@ -24,6 +24,21 @@ router = APIRouter(
 manager = ConnectionManager()
 
 
+@router.websocket("/ws/{token}/{match_id}")
+async def websocket_spectator_endpoint(websocket: WebSocket,
+                                       match_id: int,
+                                       current_user: Users = Depends(socket_get_user)):
+    match: Matches = await MatchesDAO.find_one_or_none(id=match_id, end=False)
+    if match is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    await manager.connect(websocket, match.id, current_user.id)
+    try:
+        while True:
+            data_str = await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, match.id)
+
+
 @router.websocket("/ws/{token}")
 async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends(socket_get_user)):
     if not current_user.inGame:
