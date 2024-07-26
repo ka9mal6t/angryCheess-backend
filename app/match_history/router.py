@@ -52,7 +52,7 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
             data_str = await websocket.receive_text()
             try:
                 data = json.loads(data_str)
-                if data.get("board") == 'win' and manager.check_status(match_id=match.id):
+                if data.get("board") == 'win':
                     response_dict = {'id': current_user.id,
                                      'board': 'win'
                                      }
@@ -83,7 +83,7 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
                                             id=match.id)
                     await UsersDAO.update({'inGame': False},
                                           id=rival_id)
-                elif data.get("board") == 'draw' and manager.check_status(match_id=match.id):
+                elif data.get("board") == 'draw':
                     response_dict = {'id': current_user.id,
                                      'board': 'draw'
                                      }
@@ -115,7 +115,7 @@ async def websocket_endpoint(websocket: WebSocket, current_user: Users = Depends
                     await UsersDAO.update({'inGame': False},
                                           id=rival_id)
 
-                elif data.get("board") and manager.check_status(match_id=match.id):
+                elif data.get("board"):
                     # чья очередь ходить?
                     print('+')
                     history = await MatchHistoryDAO.find_all(match_id=match.id)
