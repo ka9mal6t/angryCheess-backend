@@ -6,6 +6,7 @@ from app.recovery.router import router as recovery_router
 from app.statistics.router import router as statistic_router
 from app.search.router import router as search_router
 from app.match_history.router import router as match_history_router
+from app.matches.router import router as matches_router
 
 app = FastAPI()
 
@@ -34,6 +35,7 @@ app.add_middleware(
                    "Access-Control-Allow-Origin",
                    "Authorization"]
 )
+
 
 
 
