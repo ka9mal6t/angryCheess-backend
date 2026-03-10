@@ -12,8 +12,14 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
+    print("STARTUP RUNNING")
+    print("DB URL:", DATABASE_URL)
+    print("TABLES:", Base.metadata.tables.keys())
+
     async with engine_async.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    print("CREATE ALL FINISHED")
 
 
 app.include_router(user_router)
@@ -41,4 +47,5 @@ app.add_middleware(
                    "Access-Control-Allow-Origin",
                    "Authorization"]
 )
+
 
