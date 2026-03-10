@@ -6,9 +6,14 @@ from app.recovery.router import router as recovery_router
 from app.statistics.router import router as statistic_router
 from app.search.router import router as search_router
 from app.match_history.router import router as match_history_router
-from app.matches.router import router as matches_router
+from app.database import engine_async, Base
 
 app = FastAPI()
+
+@app.on_event("startup")
+async def startup():
+    async with engine_async.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 
 app.include_router(user_router)
@@ -36,3 +41,4 @@ app.add_middleware(
                    "Access-Control-Allow-Origin",
                    "Authorization"]
 )
+
